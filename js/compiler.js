@@ -1925,10 +1925,25 @@ function checkObjectsAreLayered(state) {
 			}
 			if (found===false) {
 				var o = state.objects[n];
-				logError('Object "' + n.toUpperCase() + '" has been defined, but not assigned to a layer.',o.lineNumber);
+				logError('Object "' + n.toUpperCase() + '" has been defined,*** but not assigned to a layer.',o.lineNumber);
 			}
 		}
 	}
+}
+
+function checkConnectedTextures(state) {
+	Object.keys(state.objects).forEach(function(n) {
+		var obj = state.objects[n];
+		var emptyName = n + '_empty';
+		var cornersName = n + '_corners';
+		if (state.objects[emptyName]) {
+			var empty = state.objects[emptyName];
+			var corners = state.objects[cornersName];
+			delete state.objects[emptyName];
+			delete state.objects[cornersName];
+			generateConnectedTextures(obj, empty, corners);
+		}
+	});
 }
 
 function twiddleMetaData(state) {
@@ -2461,6 +2476,7 @@ function loadFile(str) {
 	generateRigidGroupList(state);
 
 	processWinConditions(state);
+	checkConnectedTextures(state);
 	checkObjectsAreLayered(state);
 
 	twiddleMetaData(state);
